@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "lime-transport-websocket": "^2.0.2",
-    "messaginghub-client": "^3.2.0"
+    "messaginghub-client": "^3.2.0",
+    "moment": "^2.18.1"
   }
 }

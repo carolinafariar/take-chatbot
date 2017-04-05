@@ -2,6 +2,7 @@ import * as MessagingHub from 'messaginghub-client';
 import Credentials from './configs/credentials.js';
 const WebSocketTransport = require('lime-transport-websocket');
 import Lime from 'lime-js';
+import Bot from './Bot';
 
 let client = new MessagingHub.ClientBuilder()
     .withIdentifier(Credentials.blip.identifier)
@@ -9,15 +10,7 @@ let client = new MessagingHub.ClientBuilder()
     .withTransportFactory(() => new WebSocketTransport())
     .build();
 
-function registerAction(resource) {
-    return client.sendCommand({
-        id: Lime.Guid(),
-        method: Lime.CommandMethod.SET,
-        type: 'application/vnd.iris.eventTrack+json',
-        uri: '/event-track',
-        resource: resource
-    })
-}
+let bot = new Bot(client);
 
 client.connectWithKey(Credentials.blip.identifier, Credentials.blip.accessKey).then((session) => {
     console.log('CONECTADO');
@@ -27,8 +20,8 @@ client.connectWithKey(Credentials.blip.identifier, Credentials.blip.accessKey).t
 
 client.addMessageReceiver("text/plain", function (message) {
     console.log('Recebido');
-    console.log(message)
-    // This function is used to register events in Panel > Data Analytics
-    // registerAction({ category: 'User', action: 'first request' });
-    // registerAction({ category: 'User', action: 'asked again after denial' });
+    bot.handleMessage(message);
+    bot.sendTextMessage(message.from, message.content);
+    // bot.sendMediaMenu(message.from, 'Este é o menu!');
+    // bot.sendTextScheduledMessage(message.from, 'agendado');
 });
