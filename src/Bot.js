@@ -1,16 +1,37 @@
 'use strict';
-import Credentials from './configs/credentials';
+import Routes from './configs/routes';
 import moment from 'moment';
+import Util from './helpers/util';
 
 class Bot {
 
     constructor(client) {
         this._client = client;
+        this._previousOption = '';
     }
 
     handleMessage(message) {
-        if (message.type !== 'text/plain') {
-            return;
+        const helpMessageContent = ["Ficou perdido? Deixe-me te ajudar. Sobre qual assunto você deseja falar?"];
+
+        if (Util.messageContainOption(message.content, 'Ajuda')) {
+            this.sendTextMessage(message.from, helpMessageContent.toString());
+            this._previousOption = 'Comecar';
+        } else {
+            let foundSomething = false;
+            Routes.map((item) => {
+                if (Util.messageContainOption(message.content, item.message)) {
+                    if (this._previousOption === item.previousMessage) {
+                        this.sendTextMessage(message.from, item.content.toString());
+                        this._previousOption = item.message;
+                        foundSomething = true;
+                    }
+                }
+            });
+
+            if (!foundSomething) {
+                this.sendTextMessage(message.from, helpMessageContent.toString());
+                this._previousOption = 'Comecar';
+            }
         }
     }
 
@@ -164,14 +185,6 @@ class Bot {
             uri: '/event-track',
             resource: resource
         })
-    }
-
-    sendCommand() {
-        let command = {
-            uri: "/ping",
-            method: Lime.CommandMethod.GET
-        };
-        this._client.sendCommand(command);
     }
 }
 
