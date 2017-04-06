@@ -21,7 +21,4 @@ client.connectWithKey(Credentials.blip.identifier, Credentials.blip.accessKey).t
 client.addMessageReceiver("text/plain", function (message) {
     console.log('Recebido');
     bot.handleMessage(message);
-    bot.sendTextMessage(message.from, message.content);
-    // bot.sendMediaMenu(message.from, 'Este é o menu!');
-    // bot.sendTextScheduledMessage(message.from, 'agendado');
 });
